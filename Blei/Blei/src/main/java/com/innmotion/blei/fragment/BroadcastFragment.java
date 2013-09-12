@@ -5,9 +5,7 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGattServer;
 import android.bluetooth.BluetoothGattServerCallback;
-import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothManager;
-import android.bluetooth.BluetoothProfile;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -17,13 +15,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 import com.innmotion.blei.R;
 
-import java.util.List;
 import java.util.UUID;
 
 /**
@@ -32,10 +28,12 @@ import java.util.UUID;
 public class BroadcastFragment extends Fragment implements View.OnClickListener{
     private final static String TAG = BroadcastFragment.class.getSimpleName();
     private final static int REQUEST_ENABLE_BT = 1;
+    private final static int REQUEST_ENABLE_BT_DISCOVERY = 2;
     private TextView uuidView;
     private ToggleButton toggle;
+    private BluetoothManager mManager;
     private BluetoothAdapter mBluetoothAdapter;
-    private BluetoothGattServer gattServer;
+    private BluetoothGattServer mGattServer;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -51,13 +49,14 @@ public class BroadcastFragment extends Fragment implements View.OnClickListener{
         toggle.setOnClickListener(this);
 
         initUUID();
+        setupBLE();
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.broadcast_toggle:
-                setupBLE();
+                toggleBroadcast(toggle.isChecked());
                 break;
         }
 
@@ -76,21 +75,27 @@ public class BroadcastFragment extends Fragment implements View.OnClickListener{
             Log.wtf(TAG, "Failed BLE");
             Toast.makeText(getActivity(), "(╯°□°）╯︵ ┻━┻) --- Looks like you don't have BLE!", Toast.LENGTH_LONG).show();
         } else {
-            Log.wtf(TAG, "Initializing GATT Server");
             // Initializes Bluetooth adapter.
-            final BluetoothManager bluetoothManager = (BluetoothManager) getActivity().getSystemService(Context.BLUETOOTH_SERVICE);
-            gattServer = bluetoothManager.openGattServer(getActivity(), new BluetoothGattServerCallback() {
-                @Override
-                public void onConnectionStateChange(BluetoothDevice device, int status, int newState) {
-                    super.onConnectionStateChange(device, status, newState);
-                    Log.wtf(TAG, "connection changed!");
-                }
-            });
-            gattServer.getServices();
+            mManager = (BluetoothManager) getActivity().getSystemService(Context.BLUETOOTH_SERVICE);
+            mBluetoothAdapter = mManager.getAdapter();
+            if (mBluetoothAdapter == null || !mBluetoothAdapter.isEnabled()) {
+                Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+            } else {
+                setupGattServer();
+            }
         }
     }
 
-    private void setup() {
+    private void setupGattServer() {
+        mGattServer = mManager.openGattServer(getActivity(), new BluetoothGattServerCallback() {
+            @Override
+            public void onConnectionStateChange(BluetoothDevice device, int status, int newState) {
+                super.onConnectionStateChange(device, status, newState);
+                Log.wtf(TAG, "connection changed!");
+            }
+        });
+
     }
 
     @Override
@@ -98,7 +103,24 @@ public class BroadcastFragment extends Fragment implements View.OnClickListener{
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_ENABLE_BT && resultCode == Activity.RESULT_OK) {
             Log.wtf(TAG, "Started Bluetooth!");
-            setup();
+            setupGattServer();
+        } else if (requestCode == REQUEST_ENABLE_BT_DISCOVERY) {
+            if(resultCode == Activity.RESULT_CANCELED) {
+                toggle.setChecked(false);
+            } else {
+                Log.wtf(TAG, "Now in discoveryMode!");
+            }
+        }
+    }
+
+    private void toggleBroadcast(boolean on) {
+        if (on){
+            Intent discoverableIntent = new
+                    Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
+            discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
+            startActivityForResult(discoverableIntent, REQUEST_ENABLE_BT_DISCOVERY);
+        } else {
+            Log.wtf(TAG, "Should stop discovery here?");
         }
     }
 }
