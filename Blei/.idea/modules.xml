@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/Blei.iml" filepath="$PROJECT_DIR$/Blei.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Blei/Blei-Blei.iml" filepath="$PROJECT_DIR$/Blei/Blei-Blei.iml" />
+    </modules>
+  </component>
+</project>
+
