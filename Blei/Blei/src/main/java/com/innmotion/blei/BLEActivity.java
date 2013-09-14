@@ -10,10 +10,10 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.Menu;
-import com.innmotion.blei.fragment.BroadcastFragment;
-import com.innmotion.blei.fragment.ListenerFragment;
+import com.innmotion.blei.fragment.CentralClientFragment;
+import com.innmotion.blei.fragment.PeripheralServerFragment;
 
-public class BroadcastActivity extends FragmentActivity {
+public class BLEActivity extends FragmentActivity {
     private ViewPager mPager;
     private PagerAdapter mPagerAdapter;
 
@@ -79,9 +79,9 @@ public class BroadcastActivity extends FragmentActivity {
         public Fragment getItem(int position) {
             switch (position) {
                 case 0:
-                    return new BroadcastFragment();
+                    return new PeripheralServerFragment();
                 case 1:
-                    return new ListenerFragment();
+                    return new CentralClientFragment();
                 default:
                     return null;
             }

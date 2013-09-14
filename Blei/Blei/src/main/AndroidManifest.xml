@@ -22,7 +22,7 @@
 		<uses-feature android:name="android.hardware.bluetooth_le" android:required="true"/>
 
 		<activity
-            android:name="com.innmotion.blei.BroadcastActivity"
+            android:name=".BLEActivity"
             android:label="Broadcast Activity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

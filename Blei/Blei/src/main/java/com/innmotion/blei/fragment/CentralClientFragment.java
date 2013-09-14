@@ -10,7 +10,7 @@ import com.innmotion.blei.R;
 /**
  * Created by greg on 9/12/13.
  */
-public class ListenerFragment extends Fragment{
+public class CentralClientFragment extends Fragment{
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,

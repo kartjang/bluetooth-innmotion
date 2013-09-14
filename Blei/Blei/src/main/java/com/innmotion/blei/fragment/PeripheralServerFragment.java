@@ -3,8 +3,10 @@ package com.innmotion.blei.fragment;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattServer;
 import android.bluetooth.BluetoothGattServerCallback;
+import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothManager;
 import android.content.Context;
 import android.content.Intent;
@@ -25,8 +27,8 @@ import java.util.UUID;
 /**
  * Created by greg on 9/12/13.
  */
-public class BroadcastFragment extends Fragment implements View.OnClickListener{
-    private final static String TAG = BroadcastFragment.class.getSimpleName();
+public class PeripheralServerFragment extends Fragment implements View.OnClickListener{
+    private final static String TAG = PeripheralServerFragment.class.getSimpleName();
     private final static int REQUEST_ENABLE_BT = 1;
     private final static int REQUEST_ENABLE_BT_DISCOVERY = 2;
     private TextView uuidView;
@@ -34,6 +36,7 @@ public class BroadcastFragment extends Fragment implements View.OnClickListener{
     private BluetoothManager mManager;
     private BluetoothAdapter mBluetoothAdapter;
     private BluetoothGattServer mGattServer;
+    private UUID uuid;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -63,22 +66,22 @@ public class BroadcastFragment extends Fragment implements View.OnClickListener{
     }
 
     private void initUUID() {
-        UUID uuid = UUID.randomUUID();
+        uuid = UUID.randomUUID();
         uuidView = (TextView)getActivity().findViewById(R.id.uuid);
         uuidView.setText(uuid.toString());
     }
 
     private void setupBLE() {
-        // Use this check to determine whether BLE is supported on the device. Then
-        // you can selectively disable BLE-related features.
+        // Use this check to determine whether BLE is supported on the device.
         if (!getActivity().getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
-            Log.wtf(TAG, "Failed BLE");
+            Log.e(TAG, "Failed BLE");
             Toast.makeText(getActivity(), "(╯°□°）╯︵ ┻━┻) --- Looks like you don't have BLE!", Toast.LENGTH_LONG).show();
         } else {
-            // Initializes Bluetooth adapter.
+            // Initialize Bluetooth adapter.
             mManager = (BluetoothManager) getActivity().getSystemService(Context.BLUETOOTH_SERVICE);
             mBluetoothAdapter = mManager.getAdapter();
             if (mBluetoothAdapter == null || !mBluetoothAdapter.isEnabled()) {
+                // Request to enable bluetooth.
                 Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
                 startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
             } else {
@@ -96,6 +99,15 @@ public class BroadcastFragment extends Fragment implements View.OnClickListener{
             }
         });
 
+        BluetoothGattService advertiseService = setupAdvertisingService();
+        mGattServer.addService(advertiseService);
+    }
+
+    private BluetoothGattService setupAdvertisingService() {
+        BluetoothGattService service = new BluetoothGattService(uuid, BluetoothGattService.SERVICE_TYPE_PRIMARY);
+        BluetoothGattCharacteristic broadcastChar = new BluetoothGattCharacteristic(uuid, BluetoothGattCharacteristic.PROPERTY_BROADCAST, 0);
+        service.addCharacteristic(broadcastChar);
+        return service;
     }
 
     @Override
