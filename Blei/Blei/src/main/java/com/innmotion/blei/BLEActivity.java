@@ -18,15 +18,16 @@ import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.Menu;
-import android.widget.TextView;
 import android.widget.Toast;
 import com.innmotion.blei.fragment.CentralClientFragment;
 import com.innmotion.blei.fragment.PeripheralServerFragment;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class BLEActivity extends FragmentActivity {
     private final static String TAG = BLEActivity.class.getSimpleName();
     private final static int REQUEST_ENABLE_BT = 1;
-    private final static int REQUEST_ENABLE_BT_DISCOVERY = 2;
     private final int POS_SERVER = 0;
     private final int POS_CLIENT = 1;
 
@@ -36,8 +37,8 @@ public class BLEActivity extends FragmentActivity {
     private CentralClientFragment centralClientFragment;
     private BluetoothManager mBluetoothManager;
     private BluetoothAdapter mBluetoothAdapter;
-    private boolean firstRun = true;
     private SharedPreferences prefs;
+    private List<Fragment> fragments;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,8 +47,11 @@ public class BLEActivity extends FragmentActivity {
         prefs = getSharedPreferences("com.innmotion.blei", Context.MODE_PRIVATE);
         setupBLE();
 
+        fragments = new ArrayList<Fragment>();
         peripheralServerFragment = new PeripheralServerFragment();
         centralClientFragment = new CentralClientFragment();
+        fragments.add(peripheralServerFragment);
+        fragments.add(centralClientFragment);
 
         mPager = (ViewPager) findViewById(R.id.pager);
         mPagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
@@ -59,15 +63,6 @@ public class BLEActivity extends FragmentActivity {
             @Override
             public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {
                 mPager.setCurrentItem(tab.getPosition());
-
-//                if (tab.getPosition() == POS_SERVER) {
-//                    centralClientFragment.onHidden();
-//                    peripheralServerFragment.onShown();
-//                } else if (tab.getPosition() == POS_CLIENT) {
-//                    centralClientFragment.onShown();
-//                    peripheralServerFragment.onHidden();
-//                }
-
             }
 
             @Override
@@ -76,6 +71,19 @@ public class BLEActivity extends FragmentActivity {
             @Override
             public void onTabReselected(ActionBar.Tab tab, FragmentTransaction ft) {  }
         };
+
+        mPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int i, float v, int i2) {  }
+
+            @Override
+            public void onPageSelected(int i) {
+                getActionBar().setSelectedNavigationItem(i);
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int i) {  }
+        });
 
         actionBar.addTab(
                 actionBar.newTab()
@@ -89,7 +97,6 @@ public class BLEActivity extends FragmentActivity {
                         .setTabListener(tabListener)
         );
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -111,9 +118,9 @@ public class BLEActivity extends FragmentActivity {
         public Fragment getItem(int position) {
             switch (position) {
                 case POS_SERVER:
-                    return peripheralServerFragment;
+                    return fragments.get(POS_SERVER);
                 case POS_CLIENT:
-                    return centralClientFragment;
+                    return fragments.get(POS_CLIENT);
                 default:
                     return null;
             }
@@ -121,7 +128,7 @@ public class BLEActivity extends FragmentActivity {
 
         @Override
         public int getCount() {
-            return 2;
+            return fragments.size();
         }
     }
 
