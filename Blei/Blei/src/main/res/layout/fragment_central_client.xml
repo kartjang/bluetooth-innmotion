@@ -1,0 +1,50 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+	android:layout_margin="@dimen/activity_horizontal_margin"
+    tools:context=".BroadcastActivity">
+
+	<TextView
+		android:id="@+id/rssi_label"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:text="RSSI: "
+		android:textSize="26sp"
+		android:textStyle="bold"
+		/>
+
+	<TextView
+		android:id="@+id/rssi"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:text="NA"
+		android:textSize="24sp"
+		android:layout_toRightOf="@id/rssi_label"
+		android:layout_alignBaseline="@id/rssi_label"
+		android:textColor="#A4C739"
+		/>
+
+	<TextView
+		android:id="@+id/device_label"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:text="Device Detected: "
+		android:textSize="26sp"
+		android:textStyle="bold"
+		android:layout_below="@+id/rssi_label"
+		android:layout_alignParentLeft="true"/>
+
+	<TextView
+		android:id="@+id/device"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:text="NA"
+		android:textSize="24sp"
+		android:layout_toRightOf="@id/device_label"
+		android:layout_alignBaseline="@id/device_label"
+		android:textColor="#A4C739"
+		/>
+
+
+</RelativeLayout>

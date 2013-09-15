@@ -1,0 +1,120 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+	android:focusableInTouchMode="true"
+    tools:context=".BroadcastActivity">
+
+	<LinearLayout
+		android:id="@+id/generated_uuid"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:orientation="horizontal"
+		android:layout_marginTop="30dp"
+		android:gravity="center_horizontal"
+		>
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="Generated UUID: "
+			android:textSize="20sp"
+			android:id="@+id/uuid_label"
+			android:textStyle="bold"
+			/>
+
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:textSize="20sp"
+			android:id="@+id/uuid"
+			android:textColor="#A4C739"
+			/>
+
+	</LinearLayout>
+
+	<ToggleButton
+		android:id="@+id/broadcast_toggle"
+		android:layout_width="match_parent"
+		android:layout_height="80dp"
+		android:layout_alignParentBottom="true"
+		android:textOff="Gatt Server - stopped"
+		android:textOn="Gatt Server - running"
+		android:textSize="20sp"
+		android:onClick="toggleBroadcast"
+		/>
+
+	<LinearLayout
+		android:id="@+id/my_address"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:orientation="horizontal"
+		android:layout_below="@id/generated_uuid"
+		android:layout_marginTop="30dp"
+		android:gravity="center_horizontal"
+		>
+
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="My address: "
+			android:textSize="20sp"
+			android:textStyle="bold"
+			/>
+
+		<TextView
+			android:id="@+id/address"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text=""
+			android:textSize="20sp"
+			android:textColor="#A4C739"
+			/>
+	</LinearLayout>
+
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:layout_below="@id/my_address"
+		android:orientation="vertical"
+		>
+		<LinearLayout
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:orientation="horizontal"
+			android:layout_marginTop="30dp"
+			android:gravity="center_horizontal"
+			>
+			<EditText
+				android:id="@+id/address_input"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:ems="10"
+				android:hint="00:00:00:00:00:00"
+				android:layout_below="@+id/uuid"
+				android:layout_alignRight="@+id/button"
+				android:gravity="center_horizontal"
+				android:capitalize="characters"
+				/>
+
+			<ToggleButton
+				android:id="@+id/connect_toggle"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:textOn="Connected"
+				android:textOff="Connect"
+				android:layout_alignBottom="@+id/editText"
+				android:layout_centerHorizontal="true"/>
+
+		</LinearLayout>
+
+		<TextView
+			android:id="@+id/connected_address"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:textSize="18sp"
+			android:gravity="center_horizontal"
+			/>
+
+
+	</LinearLayout>
+</RelativeLayout>
