@@ -3,5 +3,6 @@
 
     <string name="app_name">Blei</string>
     <string name="action_settings">Settings</string>
+	<string name="gatt_device_status">This gatt server -device status: %s</string>
 
 </resources>

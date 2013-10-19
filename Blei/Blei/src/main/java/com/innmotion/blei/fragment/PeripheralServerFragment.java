@@ -4,6 +4,7 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCallback;
 import android.bluetooth.BluetoothGattCharacteristic;
+import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothGattServer;
 import android.bluetooth.BluetoothGattServerCallback;
 import android.bluetooth.BluetoothGattService;
@@ -101,20 +102,65 @@ public class PeripheralServerFragment extends Fragment implements View.OnClickLi
     }
 
     private void setupGattServer() {
-        Log.d(TAG, "Creating Gatt Server");
+
         Toast.makeText(getActivity(), "Starting Gatt server...", Toast.LENGTH_LONG).show();
         mGattServer = activity.getmBluetoothManager().openGattServer(getActivity(), new BluetoothGattServerCallback() {
             @Override
             public void onConnectionStateChange(BluetoothDevice device, int status, int newState) {
                 super.onConnectionStateChange(device, status, newState);
-                Log.wtf(TAG, "connection changed!");
+                Log.wtf(TAG, "This gatt server -Connection state changed!");
+                Log.wtf(TAG, activity.getString(R.string.gatt_device_status) + status);
+                if (newState == BluetoothGatt.STATE_CONNECTED) {
+                    Log.wtf(TAG, "This gatt server - " + device.getAddress() + " connected");
+                } else if (newState == BluetoothGatt.STATE_DISCONNECTED) {
+                    Log.wtf(TAG, "This gatt server - " + device.getAddress() + " disconnected");
+                }
+            }
+
+            @Override
+            public void onServiceAdded(int status, BluetoothGattService service) {
+                super.onServiceAdded(status, service);
+                Log.wtf(TAG, "onServiceAdded - " + service.getType());
+            }
+
+            @Override
+            public void onCharacteristicReadRequest(BluetoothDevice device, int requestId, int offset, BluetoothGattCharacteristic characteristic) {
+                super.onCharacteristicReadRequest(device, requestId, offset, characteristic);
+                Log.wtf(TAG, "onCharacteristicReadRequest");
+            }
+
+            @Override
+            public void onCharacteristicWriteRequest(BluetoothDevice device, int requestId, BluetoothGattCharacteristic characteristic, boolean preparedWrite, boolean responseNeeded, int offset, byte[] value) {
+                super.onCharacteristicWriteRequest(device, requestId, characteristic, preparedWrite, responseNeeded, offset, value);
+                Log.wtf(TAG, "onCharacteristicWriteRequest");
+            }
+
+            @Override
+            public void onDescriptorReadRequest(BluetoothDevice device, int requestId, int offset, BluetoothGattDescriptor descriptor) {
+                super.onDescriptorReadRequest(device, requestId, offset, descriptor);
+                Log.wtf(TAG, "onDescriptorReadRequest");
+            }
+
+            @Override
+            public void onDescriptorWriteRequest(BluetoothDevice device, int requestId, BluetoothGattDescriptor descriptor, boolean preparedWrite, boolean responseNeeded, int offset, byte[] value) {
+                super.onDescriptorWriteRequest(device, requestId, descriptor, preparedWrite, responseNeeded, offset, value);
+                Log.wtf(TAG, "onDescriptorWriteRequest");
+            }
+
+            @Override
+            public void onExecuteWrite(BluetoothDevice device, int requestId, boolean execute) {
+                super.onExecuteWrite(device, requestId, execute);
+                Log.wtf(TAG, "onExecuteWrite");
+
             }
         });
 
         BluetoothGattService advertiseService = setupGattAdvertisingService();
-        mGattServer.addService(advertiseService);
-
-        //
+        if (mGattServer != null) {
+            mGattServer.addService(advertiseService);
+        } else {
+            Log.wtf(TAG, "Tried to add service to server, but it was null!");
+        }
 
     }
 
@@ -143,8 +189,23 @@ public class PeripheralServerFragment extends Fragment implements View.OnClickLi
                     @Override
                     public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
                         super.onConnectionStateChange(gatt, status, newState);
-                        Log.wtf(TAG, "Connection state changed!");
-                        Log.wtf(TAG, "rssi = " + gatt.readRemoteRssi());
+                        if (newState == BluetoothGatt.STATE_CONNECTED) {
+                            Log.wtf(TAG, "other device -Connected Gatt!");
+                        } else if (newState == BluetoothGatt.STATE_DISCONNECTED) {
+                            Log.wtf(TAG, "other device -Disconnected Gatt!");
+                        }
+
+                        if (status == BluetoothGatt.GATT_SUCCESS) {
+                            Log.wtf(TAG, "other device -Gatt status: GATT_SUCCESS");
+                        }
+
+                        gatt.readRemoteRssi();
+                    }
+
+                    @Override
+                    public void onReadRemoteRssi(BluetoothGatt gatt, int rssi, int status) {
+                        super.onReadRemoteRssi(gatt, rssi, status);
+                        Log.wtf(TAG, "rssi = " + rssi);
                     }
                 });
                 ((TextView)getActivity().findViewById(R.id.connected_address)).setText(connectedDevice.getAddress());
@@ -155,6 +216,7 @@ public class PeripheralServerFragment extends Fragment implements View.OnClickLi
             }
         } else {
             if (connectedGatt != null) {
+                Log.wtf(TAG, "Disconnected from other gatt server!");
                 connectedGatt.disconnect();
             }
             ((TextView)getActivity().findViewById(R.id.connected_address)).setText("");
@@ -166,8 +228,10 @@ public class PeripheralServerFragment extends Fragment implements View.OnClickLi
             setupGattServer();
         } else {
             if (mGattServer != null) {
-                Log.d(TAG, "Closing server");
+                Log.wtf(TAG, "Closing server");
                 mGattServer.close();
+            } else {
+                Log.wtf(TAG, "Tried to stop Gatt server but failed.");
             }
         }
     }
