@@ -1,5 +1,6 @@
 package com.innmotion.blei.fragment;
 
+import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCallback;
@@ -63,7 +64,9 @@ public class PeripheralServerFragment extends Fragment implements View.OnClickLi
             inputAddress.setText(inputCachedText);
         }
         initUUID();
-        ((TextView)activity.findViewById(R.id.address)).setText(activity.getmBluetoothAdapter().getAddress());
+        String address = BluetoothAdapter.getDefaultAdapter().getAddress();
+        TextView addressView = (TextView) activity.findViewById(R.id.address);
+        addressView.setText(address);
 
     }
 

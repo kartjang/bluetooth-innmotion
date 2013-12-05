@@ -115,6 +115,5 @@
 			android:gravity="center_horizontal"
 			/>
 
-
 	</LinearLayout>
 </RelativeLayout>
